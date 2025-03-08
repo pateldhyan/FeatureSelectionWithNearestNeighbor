@@ -22,7 +22,7 @@ int CrossValidation(vector<int> data, vector<int> currentFeatures, int featureTo
 }
 
 void FeatureSearch(vector<int> data){
-    vector<int> featuresAdded(4,0);     //0 indicates not in current set yet, 1 indicates in set
+    vector<int> featuresAdded(data.size()-1, 0);     //0 indicates not in current set yet, 1 indicates in set
 
     for(int i = 1; i < data.size(); i++){
         cout << "On level " << i << " of the search tree: " << endl;
@@ -46,7 +46,7 @@ void FeatureSearch(vector<int> data){
 }
 
 int main(){
-    vector<int> data = {0, 0, 0, 0, 0};
+    vector<int> data = {0, 0, 0, 0, 0, 0, 0, 0};
     FeatureSearch(data);
     return 0;
 }
