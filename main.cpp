@@ -37,6 +37,14 @@ void FeatureSearch(vector<int> data){
 }
 
 int main(){
-
+    //Test if data import works
+    vector<vector<double>> dataSet; 
+    dataSet = DataImport();
+    for (int i = 0; i < 5 ; i++) {
+        for (double value : dataSet[i]) {
+            cout << value << " ";
+        }
+        cout << endl;
+    }
     return 0;
 }
