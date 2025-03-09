@@ -4,10 +4,10 @@
 using namespace std;
 
 vector<int> DataImport(){
-    //Include data import code
-    //ASCII text, 8 place floating numbers
-    //First column indicates class (1 or 2)
-    //Other columns contain features
+    string fileName;
+    cout <<  "Enter the name of the file you would like to import" << endl;
+    cin >> fileName;
+
 }
 
 void FeatureSearch(vector<int> data){
