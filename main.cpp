@@ -32,7 +32,7 @@ vector<vector<double>> DataImport(){
     return dataSet;
 }
 
-double EuclidianDistance(vector<double> vec1, vector<double> vec2){
+double EuclidianDistance(vector<double>& vec1, vector<double>& vec2){
     double squaredSum = 0;
     for(int i = 0; i < vec1.size(); i++){
         double temp = vec2.at(i) - vec1.at(i);
@@ -86,26 +86,38 @@ double CrossValidation(vector<vector<double>> data, vector<int> currentFeatures,
     return accuracy;
 }
 
+void printVec(vector<int>& v){
+    for (auto i : v)
+        cout << i << " ";
+}
+bool isInVec(vector<int>& v, int testInt){
+    for (int i = 0; i < v.size(); i++) {
+        if (v.at(i) == testInt) {
+            return true; 
+        }
+    }
+    return false;
+}
 void FeatureSearch(vector<vector<double>> data){
-    vector<int> featuresAdded(data.size()-1, 0);     //0 indicates not in current set yet, 1 indicates in set
-
-    for(int i = 1; i < data.size(); i++){
-        cout << "On level " << i << " of the search tree: " << endl;
+    //vector<int> featuresAdded(data.at(0).size()-1, 0);     //0 indicates not in current set yet, 1 indicates in set
+    vector<int> featuresAdded;
+    for(int i = 1; i < data.at(0).size(); i++){
+        cout << "On level " << i << " of the search tree with feature set {"; printVec(featuresAdded); cout << "}" << endl;
         int featureToAdd = -1;
-        int maxAccuracy = 0;
+        double maxAccuracy = -1;
 
-        for(int j = 1; j < data.size(); j++){
-            if(featuresAdded.at(j-1) == 0){
-                cout << "-- Consider adding feature " << j << endl;
-                int accuracy = CrossValidation(data, featuresAdded, j);
-                
+        for(int j = 1; j < data.at(0).size(); j++){
+            if(!isInVec(featuresAdded,j)){
+                double accuracy = CrossValidation(data, featuresAdded, j);
+                cout << "-- Consider adding feature " << j <<". Accuracy is "<< accuracy << endl;
                 if(accuracy > maxAccuracy){
                     maxAccuracy = accuracy;
                     featureToAdd = j;
                 }
             }
         }
-        featuresAdded.at(featureToAdd-1) = 1;
+        //featuresAdded.at(featureToAdd-1) = 1;
+        featuresAdded.push_back(featureToAdd);
         cout << "On level " << i << ", feature " << featureToAdd << " was added to current set." << endl;
     } 
 }
@@ -114,8 +126,8 @@ int main(){
     vector<int> currFeatures = {1};
     int featureToAdd = 2; 
     vector<vector<double>> data = DataImport();
-    double i = CrossValidation(data, currFeatures, featureToAdd);
-    cout << "Accuracy is " << i << endl;
-
+    // vector<int> feats = {1};
+    // cout << "Accuracy of {1,2} is "<< CrossValidation(data, feats, 2);
+    FeatureSearch(data);
     return 0;
 }
