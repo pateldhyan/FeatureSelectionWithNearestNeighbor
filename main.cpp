@@ -41,6 +41,7 @@ double EuclidianDistance(vector<double> vec1, vector<double> vec2){
     return sqrt(squaredSum);
 }
 
+//Leave-one-out cross validation
 double CrossValidation(vector<vector<double>> data, vector<int> currentFeatures, int featureToAdd){
     //Remove irrelavent features
     currentFeatures.push_back(featureToAdd);
