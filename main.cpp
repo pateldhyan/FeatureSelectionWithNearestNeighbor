@@ -2,13 +2,13 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <random>
 
 using namespace std;
 
 //Function to handle data set import
 //File I/O referenced from https://cplusplus.com/doc/tutorial/files/\
 // and https://cplusplus.com/reference/sstream/
-
 vector<vector<double>> DataImport(){
     string fileName;
     cout <<  "Enter the name of the file you would like to import" << endl;
@@ -32,19 +32,44 @@ vector<vector<double>> DataImport(){
     return dataSet;
 }
 
+int CrossValidation(vector<int> data, vector<int> currentFeatures, int featureToAdd){
+    // Returns random number for testing
+    // Random number generator taken from https://www.geeksforgeeks.org/how-to-generate-random-number-in-range-in-cpp/
+    random_device rd;
+    mt19937 gen(rd());
+    uniform_int_distribution<> distrib(0, 100);
+    int accuracy = distrib(gen);
+    return accuracy;
+
+}
+
 void FeatureSearch(vector<int> data){
-    //Insert feature search alg. Data import need to be done first
+    vector<int> featuresAdded(data.size()-1, 0);     //0 indicates not in current set yet, 1 indicates in set
+
+    for(int i = 1; i < data.size(); i++){
+        cout << "On level " << i << " of the search tree: " << endl;
+        int featureToAdd = -1;
+        int maxAccuracy = 0;
+
+        for(int j = 1; j < data.size(); j++){
+            if(featuresAdded.at(j-1) == 0){
+                cout << "-- Consider adding feature " << j << endl;
+                int accuracy = CrossValidation(data, featuresAdded, j);
+                
+                if(accuracy > maxAccuracy){
+                    maxAccuracy = accuracy;
+                    featureToAdd = j;
+                }
+            }
+        }
+        featuresAdded.at(featureToAdd-1) = 1;
+        cout << "On level " << i << ", feature " << featureToAdd << " was added to current set." << endl;
+    } 
 }
 
 int main(){
-    //Test if data import works
-    vector<vector<double>> dataSet; 
-    dataSet = DataImport();
-    for (int i = 0; i < 5 ; i++) {
-        for (double value : dataSet[i]) {
-            cout << value << " ";
-        }
-        cout << endl;
-    }
+    vector<int> data = {0, 0, 0, 0, 0, 0, 0, 0};
+    FeatureSearch(data);
+
     return 0;
 }
