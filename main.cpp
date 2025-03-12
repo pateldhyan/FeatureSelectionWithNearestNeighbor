@@ -32,18 +32,17 @@ vector<vector<double>> DataImport(){
     return dataSet;
 }
 
-int CrossValidation(vector<int> data, vector<int> currentFeatures, int featureToAdd){
-    // Returns random number for testing
-    // Random number generator taken from https://www.geeksforgeeks.org/how-to-generate-random-number-in-range-in-cpp/
-    random_device rd;
-    mt19937 gen(rd());
-    uniform_int_distribution<> distrib(0, 100);
-    int accuracy = distrib(gen);
-    return accuracy;
-
+int CrossValidation(vector<vector<double>> data, vector<int> currentFeatures, int featureToAdd){
+    for(int i = 0; i < size(data); i++){
+        //Extract one object and seperate features from class
+        vector<double> objectToClassify (data.at(i).begin()+1,data.at(i).end());
+        double label_objectToClassify = data.at(i).at(0);
+        cout << "Looping through i, the " << i+1 << "th object is in class " << label_objectToClassify << endl;
+    }
+    return 0;
 }
 
-void FeatureSearch(vector<int> data){
+void FeatureSearch(vector<vector<double>> data){
     vector<int> featuresAdded(data.size()-1, 0);     //0 indicates not in current set yet, 1 indicates in set
 
     for(int i = 1; i < data.size(); i++){
@@ -68,8 +67,11 @@ void FeatureSearch(vector<int> data){
 }
 
 int main(){
-    vector<int> data = {0, 0, 0, 0, 0, 0, 0, 0};
-    FeatureSearch(data);
+    vector<int> currFeatures = {1,2,3};
+    int featureToAdd = 4; 
+    vector<vector<double>> data = DataImport();
+    int i = CrossValidation(data, currFeatures, featureToAdd);
+
 
     return 0;
 }
