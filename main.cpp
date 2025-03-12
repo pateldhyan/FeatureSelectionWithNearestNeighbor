@@ -42,6 +42,15 @@ double EuclidianDistance(vector<double> vec1, vector<double> vec2){
 }
 
 double CrossValidation(vector<vector<double>> data, vector<int> currentFeatures, int featureToAdd){
+    //Remove irrelavent features
+    currentFeatures.push_back(featureToAdd);
+    for (int i = 0; i < currentFeatures.size(); i++){
+        int tempFeature = currentFeatures.at(i);
+        for(int j = 0; j < data.size(); j++){
+            data.at(j).at(tempFeature) = 0; 
+        } 
+    }
+
     int correctCount = 0;
     for(int i = 0; i < data.size(); i++){
         //Extract one object and seperate features from class 
@@ -101,8 +110,8 @@ void FeatureSearch(vector<vector<double>> data){
 }
 
 int main(){
-    vector<int> currFeatures = {1,2,3};
-    int featureToAdd = 4; 
+    vector<int> currFeatures = {1};
+    int featureToAdd = 2; 
     vector<vector<double>> data = DataImport();
     double i = CrossValidation(data, currFeatures, featureToAdd);
     cout << "Accuracy is " << i << endl;
