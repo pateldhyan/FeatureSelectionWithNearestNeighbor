@@ -1,15 +1,36 @@
 #include <vector>
 #include <iostream>
+#include <fstream>
+#include <sstream>
 #include <random>
 
 using namespace std;
 
-// vector<int> DataImport(){
-//     //Include data import code
-//     //ASCII text, 8 place floating numbers
-//     //First column indicates class (1 or 2)
-//     //Other columns contain features
-// }
+//Function to handle data set import
+//File I/O referenced from https://cplusplus.com/doc/tutorial/files/\
+// and https://cplusplus.com/reference/sstream/
+vector<vector<double>> DataImport(){
+    string fileName;
+    cout <<  "Enter the name of the file you would like to import" << endl;
+    cin >> fileName;
+    
+    ifstream file(fileName);            //Open file
+    vector<vector<double>> dataSet;     //Initialize 2D Vector to store data
+    
+    string line;                        //String to hold each row
+    while(getline(file, line)){         //Parsing each string line into a double vector
+        vector<double> row; 
+        double value;
+        istringstream strStrLine(line); 
+        while(strStrLine >> value){     //Add each number to row vector
+            row.push_back(value);
+        }
+        dataSet.push_back(row);         //Add row vector to 2D data set vector
+    }
+    file.close();
+
+    return dataSet;
+}
 
 int CrossValidation(vector<int> data, vector<int> currentFeatures, int featureToAdd){
     // Returns random number for testing
@@ -19,6 +40,7 @@ int CrossValidation(vector<int> data, vector<int> currentFeatures, int featureTo
     uniform_int_distribution<> distrib(0, 100);
     int accuracy = distrib(gen);
     return accuracy;
+
 }
 
 void FeatureSearch(vector<int> data){
@@ -48,5 +70,6 @@ void FeatureSearch(vector<int> data){
 int main(){
     vector<int> data = {0, 0, 0, 0, 0, 0, 0, 0};
     FeatureSearch(data);
+
     return 0;
 }
