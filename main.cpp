@@ -2,7 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include <random>
+#include <cmath>
 
 using namespace std;
 
@@ -32,12 +32,42 @@ vector<vector<double>> DataImport(){
     return dataSet;
 }
 
+double EuclidianDistance(vector<double> vec1, vector<double> vec2){
+    double squaredSum = 0;
+    for(int i = 0; i < vec1.size(); i++){
+        double temp = vec2.at(i) - vec1.at(i);
+        squaredSum += temp * temp; 
+    }
+    return sqrt(squaredSum);
+}
+
 int CrossValidation(vector<vector<double>> data, vector<int> currentFeatures, int featureToAdd){
-    for(int i = 0; i < size(data); i++){
-        //Extract one object and seperate features from class
+    for(int i = 0; i < data.size(); i++){
+        //Extract one object and seperate features from class 
         vector<double> objectToClassify (data.at(i).begin()+1,data.at(i).end());
         double label_objectToClassify = data.at(i).at(0);
-        cout << "Looping through i, the " << i+1 << "th object is in class " << label_objectToClassify << endl;
+
+        double nearestNeighborDistance = INT_MAX;
+        int nearestNeighborLocation = INT_MAX;
+        int nearestNeighborLabel = -1;
+        
+        //Check euclidian distance between all other data points
+        for(int j = 0; j < data.size(); j++){
+            if(i != j){
+                //Find euclidian distance between objects
+                vector<double> testObjectFeatures (data.at(j).begin()+1,data.at(j).end());
+                double distance = EuclidianDistance(objectToClassify,testObjectFeatures); 
+                
+                //Store new object if min euclidian distance
+                if(distance < nearestNeighborDistance){
+                    nearestNeighborDistance = distance;
+                    nearestNeighborLocation = j;
+                    nearestNeighborLabel = data.at(nearestNeighborLocation).at(0);
+                }
+            }
+        }
+        cout << "Object " << i+1 << " is class " << label_objectToClassify << endl;
+        cout << "Its nearest neighbor is object "<< nearestNeighborLocation + 1 << ", which is class " << nearestNeighborLabel <<endl<<endl; 
     }
     return 0;
 }
