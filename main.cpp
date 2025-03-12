@@ -41,7 +41,8 @@ double EuclidianDistance(vector<double> vec1, vector<double> vec2){
     return sqrt(squaredSum);
 }
 
-int CrossValidation(vector<vector<double>> data, vector<int> currentFeatures, int featureToAdd){
+double CrossValidation(vector<vector<double>> data, vector<int> currentFeatures, int featureToAdd){
+    int correctCount = 0;
     for(int i = 0; i < data.size(); i++){
         //Extract one object and seperate features from class 
         vector<double> objectToClassify (data.at(i).begin()+1,data.at(i).end());
@@ -49,8 +50,7 @@ int CrossValidation(vector<vector<double>> data, vector<int> currentFeatures, in
 
         double nearestNeighborDistance = INT_MAX;
         int nearestNeighborLocation = INT_MAX;
-        int nearestNeighborLabel = -1;
-        
+
         //Check euclidian distance between all other data points
         for(int j = 0; j < data.size(); j++){
             if(i != j){
@@ -62,14 +62,18 @@ int CrossValidation(vector<vector<double>> data, vector<int> currentFeatures, in
                 if(distance < nearestNeighborDistance){
                     nearestNeighborDistance = distance;
                     nearestNeighborLocation = j;
-                    nearestNeighborLabel = data.at(nearestNeighborLocation).at(0);
                 }
             }
         }
-        cout << "Object " << i+1 << " is class " << label_objectToClassify << endl;
-        cout << "Its nearest neighbor is object "<< nearestNeighborLocation + 1 << ", which is class " << nearestNeighborLabel <<endl<<endl; 
+        //count how many labels were correctly found
+        int nearestNeighborLabel = data.at(nearestNeighborLocation).at(0);
+        if (label_objectToClassify == nearestNeighborLabel){
+            correctCount += 1;
+        }    
     }
-    return 0;
+    //Calculate accuracy
+    double accuracy = static_cast<double>(correctCount) / data.size();
+    return accuracy;
 }
 
 void FeatureSearch(vector<vector<double>> data){
@@ -100,8 +104,8 @@ int main(){
     vector<int> currFeatures = {1,2,3};
     int featureToAdd = 4; 
     vector<vector<double>> data = DataImport();
-    int i = CrossValidation(data, currFeatures, featureToAdd);
-
+    double i = CrossValidation(data, currFeatures, featureToAdd);
+    cout << "Accuracy is " << i << endl;
 
     return 0;
 }
