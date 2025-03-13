@@ -200,7 +200,7 @@ int main(){
         allFeatures.push_back(i);
     }
 
-    cout << "This data set has " << numFeatures << "features, with " << data.size() << " instances." << endl; 
+    cout << "This data set has " << numFeatures << " features, with " << data.size() << " instances." << endl; 
     cout << "The accuracy of the nearest neighbor algorithm using all " << numFeatures << " features is " << CrossValidation(data, allFeatures, -1) << endl;
     cout << "Beginning search: " << endl;  
 
