@@ -11,9 +11,10 @@ using namespace std;
 // and https://cplusplus.com/reference/sstream/
 vector<vector<double>> DataImport(){
     string fileName;
-    cout <<  "Enter the name of the file you would like to import" << endl;
+    cout <<  "Enter the name of the file you would like to import: ";
     cin >> fileName;
-    
+    cout << endl;
+
     ifstream file(fileName);            //Open file
     vector<vector<double>> dataSet;     //Initialize 2D Vector to store data
     
@@ -44,7 +45,9 @@ double EuclidianDistance(vector<double>& vec1, vector<double>& vec2){
 //Leave-one-out cross validation
 double CrossValidation(vector<vector<double>> data, vector<int> currentFeatures, int featureToAdd){
     //Remove irrelavent features
-    currentFeatures.push_back(featureToAdd);
+    if(featureToAdd != -1){
+        currentFeatures.push_back(featureToAdd);
+    }
     for (int i = 0; i < currentFeatures.size(); i++){
         int tempFeature = currentFeatures.at(i);
         for(int j = 0; j < data.size(); j++){
@@ -98,36 +101,95 @@ bool isInVec(vector<int>& v, int testInt){
     }
     return false;
 }
-void FeatureSearch(vector<vector<double>> data){
-    //vector<int> featuresAdded(data.at(0).size()-1, 0);     //0 indicates not in current set yet, 1 indicates in set
+void ForwardFeatureSearch(vector<vector<double>> data){
     vector<int> featuresAdded;
+    double maxAccuracyOverall = -1;
+    double tempAccuracy = -1;
+    vector<int> bestFeatures;
+    bool accuracyIncreasing = 1;
+
     for(int i = 1; i < data.at(0).size(); i++){
-        cout << "On level " << i << " of the search tree with feature set {"; printVec(featuresAdded); cout << "}" << endl;
+        cout << "On level " << i << " of the search tree with feature set { "; printVec(featuresAdded); cout << "}" << endl;
         int featureToAdd = -1;
         double maxAccuracy = -1;
 
         for(int j = 1; j < data.at(0).size(); j++){
             if(!isInVec(featuresAdded,j)){
                 double accuracy = CrossValidation(data, featuresAdded, j);
-                cout << "-- Consider adding feature " << j <<". Accuracy is "<< accuracy << endl;
+                cout << "-- Considering adding feature " << j <<", which gives an accuracy of "<< accuracy << endl;
                 if(accuracy > maxAccuracy){
                     maxAccuracy = accuracy;
+                    tempAccuracy = accuracy;
                     featureToAdd = j;
                 }
             }
         }
         //featuresAdded.at(featureToAdd-1) = 1;
         featuresAdded.push_back(featureToAdd);
-        cout << "On level " << i << ", feature " << featureToAdd << " was added to current set." << endl;
-    } 
+        cout << "On level " << i << ", feature " << featureToAdd << " was added to current set." << endl << endl;
+
+        if(accuracyIncreasing == 1 && tempAccuracy < maxAccuracyOverall){
+            cout << "WARNING: Accuracy is decreasing. Will complete search in case of local maxima" << endl << endl;
+            accuracyIncreasing = 0;
+        }
+        if (tempAccuracy > maxAccuracyOverall){
+            maxAccuracyOverall = tempAccuracy;
+            bestFeatures = featuresAdded; 
+        }   
+    }
+    
+    cout << "The best feature set was { "; printVec(bestFeatures); cout << "} with an accuracy of " << maxAccuracyOverall << endl;
+}
+
+void ReverseFeatureSearch(vector<vector<double>> data){
+    //Start with all features
+    vector<int> featuresAdded;
+    for(int i = 1; i < data.at(0).size(); i++){
+        featuresAdded.push_back(i);
+    }
+    double maxAccuracyOverall = -1;
+    double tempAccuracy = -1;
+    vector<int> bestFeatures;
+    bool accuracyIncreasing = 1;
+
+    for(int i = 1; i < data.at(0).size() - 1; i++){
+        cout << "On level " << i << " of the search tree with feature set { "; printVec(featuresAdded); cout << "}" << endl;
+        int featureToRemove = -1;
+        double maxAccuracy = -1;
+    
+        for(int j = 0; j < featuresAdded.size(); j++){
+            int currFeature = featuresAdded.at(j);
+            vector<int> tempFeatures = featuresAdded;
+            tempFeatures.erase(tempFeatures.begin()+j);
+            double accuracy = CrossValidation(data, tempFeatures, -1);
+            cout << "-- Considering removing feature " << currFeature <<", which gives an accuracy of "<< accuracy << endl;
+            if(accuracy > maxAccuracy){
+                maxAccuracy = accuracy;
+                tempAccuracy = accuracy;
+                featureToRemove = j;
+            }
+        }
+        featuresAdded.erase(featuresAdded.begin() + featureToRemove);
+        cout << "On level " << i << ", feature " << featureToRemove << " was added to current set." << endl << endl;
+
+        if(accuracyIncreasing == 1 && tempAccuracy < maxAccuracyOverall){
+            cout << "WARNING: Accuracy is decreasing. Will complete search in case of local maxima" << endl << endl;
+            accuracyIncreasing = 0;
+        }
+        if (tempAccuracy > maxAccuracyOverall){
+            maxAccuracyOverall = tempAccuracy;
+            bestFeatures = featuresAdded; 
+        }   
+    }
+    
+    cout << "The best feature set was { "; printVec(bestFeatures); cout << "} with an accuracy of " << maxAccuracyOverall << endl;
 }
 
 int main(){
     vector<int> currFeatures = {1};
     int featureToAdd = 2; 
+
     vector<vector<double>> data = DataImport();
-    // vector<int> feats = {1};
-    // cout << "Accuracy of {1,2} is "<< CrossValidation(data, feats, 2);
-    FeatureSearch(data);
+    ReverseFeatureSearch(data);
     return 0;
 }
