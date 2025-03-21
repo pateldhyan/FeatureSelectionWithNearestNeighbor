@@ -11,7 +11,8 @@ using namespace std;
 // and https://cplusplus.com/reference/sstream/
 vector<vector<double>> DataImport(){
     string fileName;
-    cout <<  "Enter the name of the file you would like to import: ";
+    cout << "Welcome to Dhyan Patel's Feature Selection Algorithm." << endl;
+    cout <<  "Type in the name of the file to test:  ";
     cin >> fileName;
     cout << endl;
 
@@ -86,7 +87,6 @@ double CrossValidation(vector<vector<double>> data, vector<int> currentFeatures,
                 }
             }
         }
-        //cout << "Object " << i+1 << " nearest neighbor is " << nearestNeighborLocation+1 << " with distance " << nearestNeighborDistance << endl;
         //count how many labels were correctly found
         int nearestNeighborLabel = data.at(nearestNeighborLocation).at(0);
         if (label_objectToClassify == nearestNeighborLabel){
@@ -111,19 +111,15 @@ void ForwardFeatureSearch(vector<vector<double>> data){
 
     //Iterate through each level
     for(int i = 1; i < data.at(0).size(); i++){
-        //Accuracy of current feature set
-        double currAccuracy = CrossValidation(data, featuresAdded, -1);
-        cout << "On level " << i << " of the search tree with feature set { ";
-        printVec(featuresAdded); 
-        cout << "}, we have an accuracy of " << currAccuracy*100 << "%."  << endl;
-
         int featureToAdd = -1;
         double maxAccuracy = -1;
         //Test accuracy with every unadded feature, determine which is best
         for(int j = 1; j < data.at(0).size(); j++){
             if(!isInVec(featuresAdded,j)){
                 double accuracy = CrossValidation(data, featuresAdded, j);
-                cout << "-- Considering adding feature " << j <<", which gives an accuracy of "<< accuracy * 100 << "%."<< endl;
+                vector<int> temp = featuresAdded;
+                temp.push_back(j); 
+                cout << "   Using feature(s) { "; printVec(temp); cout <<"} accuracy is "<< accuracy * 100 << "%"<< endl;
                 if(accuracy > maxAccuracy){
                     maxAccuracy = accuracy;
                     tempAccuracy = accuracy;
@@ -133,10 +129,10 @@ void ForwardFeatureSearch(vector<vector<double>> data){
         }
         //Add best feature
         featuresAdded.push_back(featureToAdd);
-        cout << "On level " << i << ", feature " << featureToAdd << " was added to current set." << endl << endl;
+        cout << endl << "Feature set { "; printVec(featuresAdded); cout << "} was best, accuracy is " << maxAccuracy * 100 << "%" << endl << endl;
 
         if(accuracyIncreasing == 1 && tempAccuracy < maxAccuracyOverall){
-            cout << "WARNING: Accuracy is decreasing. Will complete search in case of local maxima" << endl << endl;
+            cout << "(Warning, Accuracy has decreased. Continuing search in case of local maxima)" << endl << endl;
             accuracyIncreasing = 0;
         }
         //Keep track of best feature set so far
@@ -146,7 +142,7 @@ void ForwardFeatureSearch(vector<vector<double>> data){
         }   
     }
     
-    cout << "The best feature set was { "; printVec(bestFeatures); cout << "} with an accuracy of " << maxAccuracyOverall * 100 << "%." << endl;
+    cout << "Finished search! The best feature subset is { "; printVec(bestFeatures); cout << "}, which has an accuracy of " << maxAccuracyOverall * 100 << "%" << endl;
 }
 //Same as forward search, but starts with all features and removes one at a time
 void ReverseFeatureSearch(vector<vector<double>> data){
@@ -161,9 +157,6 @@ void ReverseFeatureSearch(vector<vector<double>> data){
     bool accuracyIncreasing = 1;
 
     for(int i = 1; i < data.at(0).size(); i++){
-        cout << "On level " << i << " of the search tree with feature set { "; 
-        printVec(featuresAdded); 
-        cout << "}, we have an accuracy of " << CrossValidation(data, featuresAdded, -1)* 100 << "%."  << endl;
         int featureToRemove = -1;
         double maxAccuracy = -1;
     
@@ -172,18 +165,18 @@ void ReverseFeatureSearch(vector<vector<double>> data){
             vector<int> tempFeatures = featuresAdded;
             tempFeatures.erase(tempFeatures.begin()+j);
             double accuracy = CrossValidation(data, tempFeatures, -1);
-            cout << "-- Considering removing feature " << currFeature <<", which gives an accuracy of "<< accuracy * 100 << "%." << endl;
+            cout << "   Removing feature {" << currFeature <<"} accuracy is "<< accuracy * 100 << "%" << endl;
             if(accuracy > maxAccuracy){
                 maxAccuracy = accuracy;
                 tempAccuracy = accuracy;
                 featureToRemove = j;
             }
         }
-        cout << "On level " << i << ", feature " << featuresAdded.at(featureToRemove) << " was removed from current set." << endl << endl;
+        cout << endl <<"Feature {" << featuresAdded.at(featureToRemove) << "} was best to remove. " << endl; 
         featuresAdded.erase(featuresAdded.begin() + featureToRemove);
-
+        cout << "The current data set is { "; printVec(featuresAdded); cout << "} "<< endl << endl;
         if(accuracyIncreasing == 1 && tempAccuracy < maxAccuracyOverall){
-            cout << "WARNING: Accuracy is decreasing. Will complete search in case of local maxima" << endl << endl;
+            cout << "(Warning, accuracy has decreased. Continuing search in case of local maxima)" << endl << endl;
             accuracyIncreasing = 0;
         }
         if (tempAccuracy > maxAccuracyOverall){
@@ -192,14 +185,14 @@ void ReverseFeatureSearch(vector<vector<double>> data){
         }   
     }
     
-    cout << "The best feature set was { "; printVec(bestFeatures); cout << "} with an accuracy of " << maxAccuracyOverall * 100 << "%." << endl;
+    cout << "Finished search! The best feature subset was { "; printVec(bestFeatures); cout << "}, which has an accuracy of " << maxAccuracyOverall * 100 << "%." << endl;
 }
 
 int main(){
     vector<vector<double>> data = DataImport();
-    cout << "We will run 'leaving-one-out' evaluation. Would you like to use: " << endl;
-    cout << "[1] Forward Selection" << endl;
-    cout << "[2] Backwards Elimination" << endl;
+    cout << "Type the number of the algorithm you want to run. " << endl << endl;
+    cout << "   1) Forward Selection" << endl;
+    cout << "   2) Backwards Elimination" << endl;
     int userInput;
     cin >> userInput;
     int numFeatures  = data.at(0).size() -1;
@@ -208,9 +201,10 @@ int main(){
         allFeatures.push_back(i);
     }
 
-    cout << "This data set has " << numFeatures << " features, with " << data.size() << " instances." << endl; 
-    cout << "The accuracy of the nearest neighbor algorithm using all " << numFeatures << " features is " << CrossValidation(data, allFeatures, -1)*100 << "%." <<endl<<endl;
-    cout << "Beginning search: " << endl;  
+    cout << endl << "This dataset has " << numFeatures << " features (not including the class attribute), with " << data.size() << " instances." << endl; 
+    cout << endl << endl;
+    cout << "Running nearest neighbor with all " << numFeatures << " features, using 'leaving-one-out' evaluation, I get an accuracy of "<<  CrossValidation(data, allFeatures, -1)*100 << "%" <<endl;
+    cout << endl << "Beginning search. " << endl << endl;  
 
     if(userInput == 1){
         ForwardFeatureSearch(data);
